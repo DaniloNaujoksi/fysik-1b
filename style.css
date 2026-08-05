@@ -243,6 +243,55 @@ section.active { display: block; }
 }
 .eli5 b { color: var(--accent); }
 
+/* Dr. Willy — personlig lärare */
+.drw {
+  display: flex;
+  gap: var(--s2);
+  align-items: flex-start;
+  margin-bottom: var(--s3);
+}
+.drw img {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 18% 12%;
+  border: 2px solid var(--primary);
+  flex-shrink: 0;
+  background: #fdfcf8;
+}
+.drw-bubble {
+  position: relative;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  padding: var(--s2);
+  color: var(--text-2);
+  max-width: 62ch;
+}
+.drw-bubble::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 30px;
+  width: 12px;
+  height: 12px;
+  background: var(--surface-2);
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transform: rotate(45deg);
+}
+.drw-bubble .drw-name {
+  display: block;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 4px;
+  font-size: var(--fs-0);
+}
+.drw.mini img { width: 44px; height: 44px; border-width: 1.5px; }
+.drw.mini .drw-bubble { padding: 10px var(--s2); }
+.drw.mini .drw-bubble::before { top: 15px; }
+
 .joke {
   font-style: italic;
   color: var(--text-3);

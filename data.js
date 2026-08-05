@@ -52,7 +52,9 @@ const STRINGS = {
     sFriction: 'Friktion', sDropAgain: '🔄 Släpp kulan igen', sEp: 'Lägesenergi', sEk: 'Rörelseenergi', sHeatLoss: 'Värme (förlust)', sHeatBar: 'Värme',
     sDepth: 'Djup', sWaterP: 'Vattentryck', sTotalP: 'Totalt tryck (inkl. luft)', sSurface: 'yta (0 m)',
     sPowerW: 'Effekt', sRestart: '🧊 Börja om (20 °C)', sTemp: 'Temperatur', sEnergyIn: 'Tillförd energi', sStatus: 'Status',
-    sWaiting: 'Väntar…', sHeating: 'Värmer upp…', sBoiling: 'Kokar! Fasövergång', sAllGone: 'Allt har kokat bort! 💨', sPlate: 'spisplatta'
+    sWaiting: 'Väntar…', sHeating: 'Värmer upp…', sBoiling: 'Kokar! Fasövergång', sAllGone: 'Allt har kokat bort! 💨', sPlate: 'spisplatta',
+    drwName: 'Dr. Willy',
+    drwWelcome: 'Hej! Jag är <b>Dr. Willy</b>, din personliga fysiklärare. Jag har läst ALLA formelsamlingar så att du slipper. Vi kör enkelt, roligt och steg för steg. Och nej — det blir ingen fika förrän quizet är klart! ☕'
   },
   de: {
     siteTitle: 'Williams Physiklabor',
@@ -103,7 +105,9 @@ const STRINGS = {
     sFriction: 'Reibung', sDropAgain: '🔄 Kugel nochmal loslassen', sEp: 'Lageenergie', sEk: 'Bewegungsenergie', sHeatLoss: 'Wärme (Verlust)', sHeatBar: 'Wärme',
     sDepth: 'Tiefe', sWaterP: 'Wasserdruck', sTotalP: 'Gesamtdruck (inkl. Luft)', sSurface: 'Oberfläche (0 m)',
     sPowerW: 'Leistung', sRestart: '🧊 Neustart (20 °C)', sTemp: 'Temperatur', sEnergyIn: 'Zugeführte Energie', sStatus: 'Status',
-    sWaiting: 'Wartet…', sHeating: 'Heizt auf…', sBoiling: 'Kocht! Phasenübergang', sAllGone: 'Alles verkocht! 💨', sPlate: 'Herdplatte'
+    sWaiting: 'Wartet…', sHeating: 'Heizt auf…', sBoiling: 'Kocht! Phasenübergang', sAllGone: 'Alles verkocht! 💨', sPlate: 'Herdplatte',
+    drwName: 'Dr. Willy',
+    drwWelcome: 'Hej! Ich bin <b>Dr. Willy</b>, dein persönlicher Physiklehrer. Ich habe ALLE Formelsammlungen gelesen, damit du es nicht musst. Wir machen das einfach, lustig und Schritt für Schritt. Und nein — Fika gibt es erst nach dem Quiz! ☕'
   }
 };
 
@@ -169,6 +173,10 @@ const MODULES = [
     joke: {
       sv: 'Ohm, Ohm på hemmet... förlåt. Vi går vidare.',
       de: 'Trautes Heim, Ohm allein... Entschuldigung. Weiter im Text.'
+    },
+    drw: {
+      sv: 'Lyssna nu! Elektroner är som jag på väg till fikarummet — de tar ALLTID vägen med minst motstånd. Lär dig Ohms lag, annars blir det inget kaffe!',
+      de: 'Jetzt aufgepasst! Elektronen sind wie ich auf dem Weg zur Fika-Pause — sie nehmen IMMER den Weg des geringsten Widerstands. Lern das Ohmsche Gesetz, sonst gibt es keinen Kaffee!'
     },
     sim: 'circuit',
     simTitle: { sv: '🧪 Simulering: Ohms lag i praktiken', de: '🧪 Simulation: Ohmsches Gesetz in Aktion' },
@@ -274,6 +282,10 @@ const MODULES = [
       sv: 'En neutron går in på en bar och frågar vad en öl kostar. Bartendern: "För dig? Ingen laddning."',
       de: 'Ein Neutron geht in eine Bar und fragt, was ein Bier kostet. Der Barkeeper: "Für dich? Keine Ladung."'
     },
+    drw: {
+      sv: 'Halveringstid? Tänk på mitt lördagsgodis: efter tio minuter är hälften borta. Efter tjugo: en fjärdedel. Exponentiellt avtagande — precis som mitt tålamod när ingen pluggat.',
+      de: 'Halbwertszeit? Denk an meine Samstagssüßigkeiten: nach zehn Minuten ist die Hälfte weg. Nach zwanzig: ein Viertel. Exponentiell abnehmend — genau wie meine Geduld, wenn keiner gelernt hat.'
+    },
     sim: 'decay',
     simTitle: { sv: '🧪 Simulering: Radioaktivt sönderfall', de: '🧪 Simulation: Radioaktiver Zerfall' },
     simDesc: {
@@ -377,6 +389,10 @@ const MODULES = [
     joke: {
       sv: 'Einstein, Newton och Pascal leker kurragömma. Einstein räknar. Newton ritar en kvadrat på 1 m² och ställer sig i den. Einstein: "Hittat! Newton!" Newton: "Nej. En Newton per kvadratmeter — jag är Pascal."',
       de: 'Einstein, Newton und Pascal spielen Verstecken. Einstein zählt. Newton malt ein Quadrat von 1 m² und stellt sich hinein. Einstein: "Gefunden! Newton!" Newton: "Nein. Ein Newton pro Quadratmeter — ich bin Pascal."'
+    },
+    drw: {
+      sv: 'Einstein säger att tiden går långsammare när man rör sig fort. Därför joggar jag aldrig — jag vägrar bli yngre än mina studenter. Fysiken förbjuder det. Typ.',
+      de: 'Einstein sagt, die Zeit vergeht langsamer, wenn man sich schnell bewegt. Deshalb jogge ich nie — ich weigere mich, jünger zu werden als meine Studenten. Die Physik verbietet das. Quasi.'
     },
     sim: 'relativity',
     simTitle: { sv: '🧪 Simulering: Tidsdilatation', de: '🧪 Simulation: Zeitdilatation' },
@@ -482,6 +498,10 @@ const MODULES = [
       sv: 'Termodynamikens tre lagar, fritt översatta: 1) Du kan inte vinna. 2) Du kan inte ens spela oavgjort. 3) Du kan inte lämna spelet.',
       de: 'Die drei Hauptsätze der Thermodynamik, frei übersetzt: 1) Du kannst nicht gewinnen. 2) Du kannst nicht mal unentschieden spielen. 3) Du kannst das Spiel nicht verlassen.'
     },
+    drw: {
+      sv: 'Energi försvinner aldrig — den byter bara form. Min frukost i morse? Nu är den föreläsningsenergi. Varsågod, det här är toppmodern fysik du får gratis.',
+      de: 'Energie verschwindet nie — sie wechselt nur die Form. Mein Frühstück heute Morgen? Ist jetzt Vorlesungsenergie. Bitte sehr, das ist Spitzenphysik gratis für dich.'
+    },
     sim: 'energy',
     simTitle: { sv: '🧪 Simulering: Kulan i backen (energiomvandling)', de: '🧪 Simulation: Kugel in der Schüssel (Energieumwandlung)' },
     simDesc: {
@@ -586,6 +606,10 @@ const MODULES = [
       sv: 'Vad sa trycket till ytan? "Du får mig att känna mig så liten när du är stor." p = F/A, romantik på fysikvis.',
       de: 'Was sagte der Druck zur Fläche? "Du lässt mich so klein fühlen, wenn du groß bist." p = F/A, Physiker-Romantik.'
     },
+    drw: {
+      sv: 'Var tionde meter under vattnet: en atmosfär till. Därför håller jag alla mina föreläsningar på land. Säkerheten först — och krittavlan flyter ändå inte.',
+      de: 'Alle zehn Meter unter Wasser: eine Atmosphäre mehr. Deshalb halte ich alle meine Vorlesungen an Land. Sicherheit zuerst — und die Kreidetafel schwimmt sowieso nicht.'
+    },
     sim: 'pressure',
     simTitle: { sv: '🧪 Simulering: Dyk ner i djupet', de: '🧪 Simulation: Tauch in die Tiefe' },
     simDesc: {
@@ -689,6 +713,10 @@ const MODULES = [
     joke: {
       sv: 'Varför är saunan på 90 °C skön men vatten på 90 °C livsfarligt? Luft har låg värmekapacitet och leder värme uselt — vattnet dumpar hundra gånger mer energi i dig. Fysik räddar liv (och bastukvällar).',
       de: 'Warum ist die Sauna bei 90 °C angenehm, aber Wasser bei 90 °C lebensgefährlich? Luft hat niedrige Wärmekapazität und leitet Wärme miserabel — Wasser kippt hundertmal mehr Energie in dich. Physik rettet Leben (und Saunaabende).'
+    },
+    drw: {
+      sv: 'Vatten har enorm värmekapacitet — därför tar mitt tekök en evighet. Perfekt: då hinner vi alltid med en genomgång till medan vi väntar. Ni är välkomna.',
+      de: 'Wasser hat eine enorme Wärmekapazität — deshalb braucht mein Teekessel eine Ewigkeit. Perfekt: dann schaffen wir beim Warten immer noch eine Wiederholung. Gern geschehen.'
     },
     sim: 'heat',
     simTitle: { sv: '🧪 Simulering: Koka vattnet', de: '🧪 Simulation: Wasser kochen' },

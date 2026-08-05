@@ -139,11 +139,20 @@ const app = (() => {
     document.getElementById(id).classList.add('active');
   }
 
+  // Dr. Willy — pratbubbla med avatar
+  function drwHtml(text, mini = false) {
+    return `<div class="drw${mini ? ' mini' : ''}">
+      <img src="assets/dr-william.png" alt="${S('drwName')}">
+      <div class="drw-bubble"><span class="drw-name">${S('drwName')}</span>${text}</div>
+    </div>`;
+  }
+
   // ---------- Startsida ----------
   function renderWelcome() {
     document.getElementById('welcome').innerHTML = `
       <div class="card">
         <h2>${S('welcomeH')}</h2>
+        ${drwHtml(S('drwWelcome'))}
         <p>${S('welcomeIntro')}</p>
         <p>${S('howItWorks')}</p>
         <ul>
@@ -194,6 +203,7 @@ const app = (() => {
       <div class="card">
         <h2>${m.icon} ${L(m.title)}</h2>
         <p>${L(m.intro)}</p>
+        ${drwHtml(L(m.drw))}
         ${m.theory.map(t => `
           <div class="theory-block">
             <h4>${L(t.h)}</h4>
@@ -265,7 +275,7 @@ const app = (() => {
     const msg = correct ? pick(S('praise')) : pick(S('roast'));
     document.getElementById('quiz-feedback').innerHTML = `
       <div class="quiz-feedback ${correct ? 'good' : 'bad'}">
-        <b>${msg}</b><br>${L(q.expl)}<br>
+        ${drwHtml(`<b>${msg}</b><br>${L(q.expl)}`, true)}
         <button class="btn-primary" onclick="app.nextQuestion()">${quiz.index + 1 < quiz.questions.length ? S('nextQ') : S('showResult')}</button>
       </div>`;
     document.getElementById('quiz-feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
