@@ -139,10 +139,14 @@ const app = (() => {
     document.getElementById(id).classList.add('active');
   }
 
-  // Dr. Willy — pratbubbla med avatar
-  function drwHtml(text, mini = false) {
+  // Dr. Willy — friställd figur med pratbubbla och humör-badge
+  const DRW_MOODS = { ellara: '😏', karnfysik: '🤘', relativitet: '🤔', energi: '🍺', tryck: '😏', varme: '🔥' };
+  function drwHtml(text, { mini = false, mood = '' } = {}) {
     return `<div class="drw${mini ? ' mini' : ''}">
-      <img src="assets/dr-william.png" alt="${S('drwName')}">
+      <div class="drw-fig">
+        <img src="assets/dr-willy.png" alt="${S('drwName')}">
+        ${mood ? `<span class="mood-badge">${mood}</span>` : ''}
+      </div>
       <div class="drw-bubble"><span class="drw-name">${S('drwName')}</span>${text}</div>
     </div>`;
   }
@@ -152,7 +156,7 @@ const app = (() => {
     document.getElementById('welcome').innerHTML = `
       <div class="card">
         <h2>${S('welcomeH')}</h2>
-        ${drwHtml(S('drwWelcome'))}
+        ${drwHtml(S('drwWelcome'), { mood: '👋' })}
         <p>${S('welcomeIntro')}</p>
         <p>${S('howItWorks')}</p>
         <ul>
@@ -203,7 +207,7 @@ const app = (() => {
       <div class="card">
         <h2>${m.icon} ${L(m.title)}</h2>
         <p>${L(m.intro)}</p>
-        ${drwHtml(L(m.drw))}
+        ${drwHtml(L(m.drw), { mood: DRW_MOODS[m.id] || '😏' })}
         ${m.theory.map(t => `
           <div class="theory-block">
             <h4>${L(t.h)}</h4>
@@ -275,7 +279,7 @@ const app = (() => {
     const msg = correct ? pick(S('praise')) : pick(S('roast'));
     document.getElementById('quiz-feedback').innerHTML = `
       <div class="quiz-feedback ${correct ? 'good' : 'bad'}">
-        ${drwHtml(`<b>${msg}</b><br>${L(q.expl)}`, true)}
+        ${drwHtml(`<b>${msg}</b><br>${L(q.expl)}`, { mini: true, mood: correct ? pick(['🤘', '🍺', '😎']) : pick(['🤦', '😵']) })}
         <button class="btn-primary" onclick="app.nextQuestion()">${quiz.index + 1 < quiz.questions.length ? S('nextQ') : S('showResult')}</button>
       </div>`;
     document.getElementById('quiz-feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -295,17 +299,19 @@ const app = (() => {
     const perfect = score === total;
     if (perfect) { addXP(20); confetti(200); }
     const pct = score / total;
-    const [emoji, verdict] =
-      perfect ? ['🏆', S('verdictPerfect')] :
-      pct >= 0.75 ? ['🚀', S('verdictGreat')] :
-      pct >= 0.5 ? ['🧪', S('verdictHalf')] :
-      ['🫠', S('verdictOof')];
+    const [emoji, verdict, mood] =
+      perfect ? ['🏆', S('verdictPerfect'), '🤘'] :
+      pct >= 0.75 ? ['🚀', S('verdictGreat'), '🍺'] :
+      pct >= 0.5 ? ['🧪', S('verdictHalf'), '😏'] :
+      ['🫠', S('verdictOof'), '🤦'];
     document.getElementById('quiz-container').innerHTML = `
       <div class="quiz-result">
         <span class="big-emoji">${emoji}</span>
         <h3>${score}/${total} ${S('correctOf')}</h3>
-        <p>${verdict}</p>
-        <p style="color:var(--text-3)">+${score * 10}${perfect ? ' +20 ' + S('bonus') : ''} XP</p><br>
+        <p style="color:var(--text-3)">+${score * 10}${perfect ? ' +20 ' + S('bonus') : ''} XP</p>
+      </div>
+      ${drwHtml(verdict, { mood })}
+      <div class="quiz-result" style="padding-top:0">
         <button class="btn-primary" onclick="app.startQuiz('${modId}')">${S('again')}</button>
         <button class="btn-ghost" onclick="app.openModule(null)" style="margin-left:8px">${S('toHome')}</button>
       </div>`;

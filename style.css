@@ -250,15 +250,23 @@ section.active { display: block; }
   align-items: flex-start;
   margin-bottom: var(--s3);
 }
-.drw img {
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 18% 12%;
-  border: 2px solid var(--primary);
+.drw-fig {
+  position: relative;
   flex-shrink: 0;
-  background: #fdfcf8;
+  align-self: flex-start;
+}
+.drw img {
+  width: 168px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .4));
+}
+.mood-badge {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .5));
 }
 .drw-bubble {
   position: relative;
@@ -288,9 +296,15 @@ section.active { display: block; }
   margin-bottom: 4px;
   font-size: var(--fs-0);
 }
-.drw.mini img { width: 44px; height: 44px; border-width: 1.5px; }
+.drw.mini img { width: 72px; }
+.drw.mini .mood-badge { font-size: 1.2rem; top: -5px; right: -4px; }
 .drw.mini .drw-bubble { padding: 10px var(--s2); }
 .drw.mini .drw-bubble::before { top: 15px; }
+
+@media (max-width: 600px) {
+  .drw img { width: 120px; }
+  .drw.mini img { width: 60px; }
+}
 
 .joke {
   font-style: italic;

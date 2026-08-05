@@ -38,12 +38,12 @@ const STRINGS = {
     bonus: 'bonus',
     again: 'Kör igen 🔄',
     toHome: 'Till start 🏠',
-    verdictPerfect: 'FULLPOTT! Du ÄR fysiken nu. Rimligtvis borde Nobelkommittén höra av sig.',
-    verdictGreat: 'Riktigt starkt! Bara lite finslipning kvar.',
-    verdictHalf: 'Halvvägs till genialitet. Läs teorin igen och kör en runda till.',
-    verdictOof: 'Aj. Men lugn — även Einstein fick underkänt ibland (nej, det är en myt, men det låter tröstande).',
-    praise: ['Snyggt! Einstein nickar gillande. 🧠', 'Korrekt! Du är på väg mot Nobelpriset. 🏅', 'Boom! Rätt svar. 💥', 'Exakt! Newton hade varit stolt. 🍎', 'Rätt! Din hjärna accelererar. 🚀', 'Japp! Fysiken är med dig. ⚛️'],
-    roast: ['Nej! Men bra gissat — sa ingen. 😅', 'Fel! Gravitationen drog ner det svaret. 🕳️', 'Ajdå. Även Einstein hade dåliga dagar. 🤷', 'Nix. Men fel svar är bara rätt svar i ett parallellt universum. 🌌', 'Nope. Läs förklaringen — den bits inte. 📖'],
+    verdictPerfect: 'FULLPOTT! Okej William, nu är jag faktiskt imponerad — och det händer ungefär aldrig. Säg inget till Daniel, Frankula och Eike, men ikväll bjuder DU på ölen. Firande. 🍻',
+    verdictGreat: 'Starkt jobbat! Nästan fullpott. En runda till så sitter det — quizrundan alltså. INTE ölrundan. Prioriteringar, William.',
+    verdictHalf: 'Hälften rätt. Som en halv öl: tekniskt sett godkänt, känslomässigt en besvikelse. Läs teorin igen, sen pratar vi.',
+    verdictOof: 'Aj aj aj. Det där var Frankula-nivå, och det är INTE en komplimang. Läs teorin, drick ett glas vatten (ja, VATTEN) och kom tillbaka.',
+    praise: ['Rätt! Till och med jag är imponerad — och jag är aldrig imponerad. 😏', 'Korrekt! Du är officiellt smartare än Frankula. Låg ribba, men ändå. 🏅', 'BOOM! Rätt svar. Ren Rammstein-pyroteknik i hjärnan. 🔥', 'Rätt! En öl närmare fredagen. 🍺', 'Exakt! Newton hade nickat gillande. Jag nickar snålare, men jag nickar. 🍎', 'Japp! Eike hade gissat fel här. Du gissade inte. …Eller? 🤨'],
+    roast: ['Nej. Daniel hade svarat exakt likadant — och det är INTE en komplimang. 😅', 'Fel! Det svaret var mer off än Frankulas danssteg. 🕺', 'Ajdå. Läs förklaringen innan jag sätter på Rammstein på full volym. 📖', 'Nix. Till och med kylskåpsölen visste bättre. Och den är en DRYCK. 🍺', 'Nope. Fint självförtroende dock. Fel, men fint. 🤷'],
     // Sim-etiketter
     sVoltage: 'Spänning U', sResistance: 'Resistans R', sCurrent: 'Ström', sPower: 'Effekt',
     sHalfLife: 'Halveringstid', sStartDecay: '☢️ Starta sönderfall', sLeft: 'Kvar', sTime: 'Tid',
@@ -54,7 +54,7 @@ const STRINGS = {
     sPowerW: 'Effekt', sRestart: '🧊 Börja om (20 °C)', sTemp: 'Temperatur', sEnergyIn: 'Tillförd energi', sStatus: 'Status',
     sWaiting: 'Väntar…', sHeating: 'Värmer upp…', sBoiling: 'Kokar! Fasövergång', sAllGone: 'Allt har kokat bort! 💨', sPlate: 'spisplatta',
     drwName: 'Dr. Willy',
-    drwWelcome: 'Hej! Jag är <b>Dr. Willy</b>, din personliga fysiklärare. Jag har läst ALLA formelsamlingar så att du slipper. Vi kör enkelt, roligt och steg för steg. Och nej — det blir ingen fika förrän quizet är klart! ☕'
+    drwWelcome: 'Tjena William! <b>Dr. Willy</b> här — din personliga fysiklärare och den betydligt smartare versionen av dig. Vi kör tills du kan det här bättre än Rammsteins diskografi. Öl efteråt. KANSKE. Om Daniel, Frankula och Eike inte redan druckit upp allt. 🍺'
   },
   de: {
     siteTitle: 'Williams Physiklabor',
@@ -92,12 +92,12 @@ const STRINGS = {
     bonus: 'Bonus',
     again: 'Nochmal 🔄',
     toHome: 'Zum Start 🏠',
-    verdictPerfect: 'VOLLE PUNKTZAHL! Du BIST jetzt die Physik. Das Nobelkomitee sollte sich melden.',
-    verdictGreat: 'Richtig stark! Nur noch etwas Feinschliff.',
-    verdictHalf: 'Halber Weg zum Genie. Lies die Theorie nochmal und starte eine neue Runde.',
-    verdictOof: 'Autsch. Aber ruhig — auch Einstein ist mal durchgefallen (nein, das ist ein Mythos, aber es tröstet).',
-    praise: ['Sauber! Einstein nickt anerkennend. 🧠', 'Korrekt! Du bist auf Nobelpreis-Kurs. 🏅', 'Boom! Richtige Antwort. 💥', 'Exakt! Newton wäre stolz. 🍎', 'Richtig! Dein Gehirn beschleunigt. 🚀', 'Jep! Die Physik ist mit dir. ⚛️'],
-    roast: ['Nein! Aber gut geraten — sagte niemand. 😅', 'Falsch! Die Gravitation hat die Antwort runtergezogen. 🕳️', 'Uups. Auch Einstein hatte schlechte Tage. 🤷', 'Nö. Aber falsche Antworten sind richtige Antworten in einem Paralleluniversum. 🌌', 'Nope. Lies die Erklärung — sie beißt nicht. 📖'],
+    verdictPerfect: 'VOLLE PUNKTZAHL! Okay William, jetzt bin ich tatsächlich beeindruckt — und das passiert ungefähr nie. Sag Daniel, Frankula und Eike nichts, aber heute Abend gibst DU das Bier aus. Feier. 🍻',
+    verdictGreat: 'Stark! Fast volle Punktzahl. Noch eine Runde und es sitzt — die Quizrunde, meine ich. NICHT die Bierrunde. Prioritäten, William.',
+    verdictHalf: 'Die Hälfte richtig. Wie ein halbes Bier: technisch okay, emotional eine Enttäuschung. Lies die Theorie nochmal, dann reden wir.',
+    verdictOof: 'Aua. Das war Frankula-Niveau, und das ist KEIN Kompliment. Lies die Theorie, trink ein Glas Wasser (ja, WASSER) und komm wieder.',
+    praise: ['Richtig! Sogar ich bin beeindruckt — und ich bin nie beeindruckt. 😏', 'Korrekt! Du bist offiziell schlauer als Frankula. Niedrige Messlatte, aber immerhin. 🏅', 'BOOM! Richtige Antwort. Reine Rammstein-Pyrotechnik im Hirn. 🔥', 'Richtig! Ein Bier näher am Freitag. 🍺', 'Exakt! Newton hätte anerkennend genickt. Ich nicke sparsamer, aber ich nicke. 🍎', 'Jep! Eike hätte hier falsch geraten. Du hast nicht geraten. …Oder? 🤨'],
+    roast: ['Nein. Daniel hätte exakt dasselbe geantwortet — und das ist KEIN Kompliment. 😅', 'Falsch! Die Antwort war mehr daneben als Frankulas Tanzschritte. 🕺', 'Uups. Lies die Erklärung, bevor ich Rammstein auf voller Lautstärke anmache. 📖', 'Nö. Sogar das Kühlschrankbier wusste es besser. Und das ist ein GETRÄNK. 🍺', 'Nope. Aber schönes Selbstbewusstsein. Falsch, aber schön. 🤷'],
     sVoltage: 'Spannung U', sResistance: 'Widerstand R', sCurrent: 'Strom', sPower: 'Leistung',
     sHalfLife: 'Halbwertszeit', sStartDecay: '☢️ Zerfall starten', sLeft: 'Übrig', sTime: 'Zeit',
     sSpeed: 'Tempo der Rakete', sGamma: 'Gammafaktor γ', sYearOnBoard: '1 Jahr an Bord =', sYearsEarth: 'Jahre auf der Erde',
@@ -107,7 +107,7 @@ const STRINGS = {
     sPowerW: 'Leistung', sRestart: '🧊 Neustart (20 °C)', sTemp: 'Temperatur', sEnergyIn: 'Zugeführte Energie', sStatus: 'Status',
     sWaiting: 'Wartet…', sHeating: 'Heizt auf…', sBoiling: 'Kocht! Phasenübergang', sAllGone: 'Alles verkocht! 💨', sPlate: 'Herdplatte',
     drwName: 'Dr. Willy',
-    drwWelcome: 'Hej! Ich bin <b>Dr. Willy</b>, dein persönlicher Physiklehrer. Ich habe ALLE Formelsammlungen gelesen, damit du es nicht musst. Wir machen das einfach, lustig und Schritt für Schritt. Und nein — Fika gibt es erst nach dem Quiz! ☕'
+    drwWelcome: 'Tjena William! <b>Dr. Willy</b> hier — dein persönlicher Physiklehrer und die deutlich schlauere Version von dir. Wir machen weiter, bis du das besser kannst als Rammsteins Diskografie. Bier danach. VIELLEICHT. Falls Daniel, Frankula und Eike nicht schon alles weggetrunken haben. 🍺'
   }
 };
 
@@ -175,8 +175,8 @@ const MODULES = [
       de: 'Trautes Heim, Ohm allein... Entschuldigung. Weiter im Text.'
     },
     drw: {
-      sv: 'Lyssna nu! Elektroner är som jag på väg till fikarummet — de tar ALLTID vägen med minst motstånd. Lär dig Ohms lag, annars blir det inget kaffe!',
-      de: 'Jetzt aufgepasst! Elektronen sind wie ich auf dem Weg zur Fika-Pause — sie nehmen IMMER den Weg des geringsten Widerstands. Lern das Ohmsche Gesetz, sonst gibt es keinen Kaffee!'
+      sv: 'Elektroner tar ALLTID vägen med minst motstånd — precis som Daniel när någon föreslår en runda till. Och nej William, "Du hast" av Rammstein handlar inte om resistans. Tyvärr.',
+      de: 'Elektronen nehmen IMMER den Weg des geringsten Widerstands — genau wie Daniel, wenn jemand noch eine Runde vorschlägt. Und nein William, "Du hast" von Rammstein handelt nicht von Widerständen. Leider.'
     },
     sim: 'circuit',
     simTitle: { sv: '🧪 Simulering: Ohms lag i praktiken', de: '🧪 Simulation: Ohmsches Gesetz in Aktion' },
@@ -283,8 +283,8 @@ const MODULES = [
       de: 'Ein Neutron geht in eine Bar und fragt, was ein Bier kostet. Der Barkeeper: "Für dich? Keine Ladung."'
     },
     drw: {
-      sv: 'Halveringstid? Tänk på mitt lördagsgodis: efter tio minuter är hälften borta. Efter tjugo: en fjärdedel. Exponentiellt avtagande — precis som mitt tålamod när ingen pluggat.',
-      de: 'Halbwertszeit? Denk an meine Samstagssüßigkeiten: nach zehn Minuten ist die Hälfte weg. Nach zwanzig: ein Viertel. Exponentiell abnehmend — genau wie meine Geduld, wenn keiner gelernt hat.'
+      sv: 'Solen? En gigantisk fusionsreaktor. Rammstein visste det redan: "Hier kommt die Sonne". Och halveringstid funkar som Eikes ölback på grillkväll: efter en timme är hälften borta — men till skillnad från uran fyller Eike ALDRIG på.',
+      de: 'Die Sonne? Ein gigantischer Fusionsreaktor. Rammstein wusste es längst: "Hier kommt die Sonne". Und Halbwertszeit funktioniert wie Eikes Bierkasten beim Grillen: nach einer Stunde ist die Hälfte weg — nur füllt Eike im Gegensatz zu Uran NIE nach.'
     },
     sim: 'decay',
     simTitle: { sv: '🧪 Simulering: Radioaktivt sönderfall', de: '🧪 Simulation: Radioaktiver Zerfall' },
@@ -391,8 +391,8 @@ const MODULES = [
       de: 'Einstein, Newton und Pascal spielen Verstecken. Einstein zählt. Newton malt ein Quadrat von 1 m² und stellt sich hinein. Einstein: "Gefunden! Newton!" Newton: "Nein. Ein Newton pro Quadratmeter — ich bin Pascal."'
     },
     drw: {
-      sv: 'Einstein säger att tiden går långsammare när man rör sig fort. Därför joggar jag aldrig — jag vägrar bli yngre än mina studenter. Fysiken förbjuder det. Typ.',
-      de: 'Einstein sagt, die Zeit vergeht langsamer, wenn man sich schnell bewegt. Deshalb jogge ich nie — ich weigere mich, jünger zu werden als meine Studenten. Die Physik verbietet das. Quasi.'
+      sv: 'Tiden går långsammare ju fortare du rör dig. Det förklarar varför Frankula ALLTID kommer sist — han lever uppenbarligen i nära ljushastighet. Snyggt fysikaliskt alibi, Frankula. Godkänt.',
+      de: 'Die Zeit vergeht langsamer, je schneller du dich bewegst. Das erklärt, warum Frankula IMMER als Letzter auftaucht — er lebt offenbar nahe der Lichtgeschwindigkeit. Starkes physikalisches Alibi, Frankula. Anerkannt.'
     },
     sim: 'relativity',
     simTitle: { sv: '🧪 Simulering: Tidsdilatation', de: '🧪 Simulation: Zeitdilatation' },
@@ -499,8 +499,8 @@ const MODULES = [
       de: 'Die drei Hauptsätze der Thermodynamik, frei übersetzt: 1) Du kannst nicht gewinnen. 2) Du kannst nicht mal unentschieden spielen. 3) Du kannst das Spiel nicht verlassen.'
     },
     drw: {
-      sv: 'Energi försvinner aldrig — den byter bara form. Min frukost i morse? Nu är den föreläsningsenergi. Varsågod, det här är toppmodern fysik du får gratis.',
-      de: 'Energie verschwindet nie — sie wechselt nur die Form. Mein Frühstück heute Morgen? Ist jetzt Vorlesungsenergie. Bitte sehr, das ist Spitzenphysik gratis für dich.'
+      sv: 'En starköl innehåller cirka 900 kJ. Energiprincipen säger: den energin försvinner INTE — den flyttar bara in i magen. Det är därför det heter ölmage, William. Vetenskap. Slå upp det.',
+      de: 'Ein Starkbier enthält etwa 900 kJ. Der Energieerhaltungssatz sagt: diese Energie verschwindet NICHT — sie zieht nur in den Bauch um. Deshalb heißt es Bierbauch, William. Wissenschaft. Schlag es nach.'
     },
     sim: 'energy',
     simTitle: { sv: '🧪 Simulering: Kulan i backen (energiomvandling)', de: '🧪 Simulation: Kugel in der Schüssel (Energieumwandlung)' },
@@ -607,8 +607,8 @@ const MODULES = [
       de: 'Was sagte der Druck zur Fläche? "Du lässt mich so klein fühlen, wenn du groß bist." p = F/A, Physiker-Romantik.'
     },
     drw: {
-      sv: 'Var tionde meter under vattnet: en atmosfär till. Därför håller jag alla mina föreläsningar på land. Säkerheten först — och krittavlan flyter ändå inte.',
-      de: 'Alle zehn Meter unter Wasser: eine Atmosphäre mehr. Deshalb halte ich alle meine Vorlesungen an Land. Sicherheit zuerst — und die Kreidetafel schwimmt sowieso nicht.'
+      sv: 'Tryck i praktiken: skaka en ölburk ordentligt och räck den till Daniel. p = F/A plus CO₂ — och plötsligt förstår hela sällskapet fysik. Gör det inte. Eller jo, gör det. Men filma.',
+      de: 'Druck in der Praxis: schüttel eine Bierdose ordentlich und reich sie Daniel. p = F/A plus CO₂ — und plötzlich versteht die ganze Runde Physik. Mach das nicht. Oder doch. Aber film es.'
     },
     sim: 'pressure',
     simTitle: { sv: '🧪 Simulering: Dyk ner i djupet', de: '🧪 Simulation: Tauch in die Tiefe' },
@@ -715,8 +715,8 @@ const MODULES = [
       de: 'Warum ist die Sauna bei 90 °C angenehm, aber Wasser bei 90 °C lebensgefährlich? Luft hat niedrige Wärmekapazität und leitet Wärme miserabel — Wasser kippt hundertmal mehr Energie in dich. Physik rettet Leben (und Saunaabende).'
     },
     drw: {
-      sv: 'Vatten har enorm värmekapacitet — därför tar mitt tekök en evighet. Perfekt: då hinner vi alltid med en genomgång till medan vi väntar. Ni är välkomna.',
-      de: 'Wasser hat eine enorme Wärmekapazität — deshalb braucht mein Teekessel eine Ewigkeit. Perfekt: dann schaffen wir beim Warten immer noch eine Wiederholung. Gern geschehen.'
+      sv: '"FEUER FREI!" — Rammstein, kända termodynamiker. Men kylskåpets fysik är viktigare: därför är ölen kall och bastun 90 grader. Båda tack vare värmelära. Varsågod, Eike.',
+      de: '"FEUER FREI!" — Rammstein, bekannte Thermodynamiker. Wichtiger ist aber die Physik des Kühlschranks: deshalb ist das Bier kalt und die Sauna 90 Grad. Beides dank Wärmelehre. Gern geschehen, Eike.'
     },
     sim: 'heat',
     simTitle: { sv: '🧪 Simulering: Koka vattnet', de: '🧪 Simulation: Wasser kochen' },
