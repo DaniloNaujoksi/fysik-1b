@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fysik 1b Fortsättning — Williams Fysiklabb 🚀</title>
+  <meta name="description" content="Interaktiv plugghjälp för Fysik 1b fortsättning — simuleringar, quiz och dåliga fysikskämt.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="stars"></div>
+
+  <header>
+    <div class="header-inner">
+      <h1>⚛️ Williams Fysiklabb</h1>
+      <p class="subtitle">Fysik 1b fortsättning — plugga som ett proffs, skratta som en idiot</p>
+      <div class="xp-bar-wrap">
+        <div class="xp-info">
+          <span id="level-title">Fysik-Turist</span>
+          <span id="xp-count">0 XP</span>
+        </div>
+        <div class="xp-bar"><div id="xp-fill"></div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav id="module-nav"></nav>
+
+  <main id="content">
+    <section id="welcome" class="active">
+      <div class="card hero-card">
+        <h2>Tjena William! 👋</h2>
+        <p>Välkommen till ditt personliga fysiklabb. Här pluggar du <strong>Fysik 1b fortsättning</strong> utan att somna över formelsamlingen.</p>
+        <p>Så funkar det:</p>
+        <ul>
+          <li>📖 <strong>Teori</strong> — det viktigaste, förklarat så att även din katt fattar</li>
+          <li>🧪 <strong>Simuleringar</strong> — lek med fysiken istället för att bara läsa om den</li>
+          <li>🎯 <strong>Quiz</strong> — samla XP och klättra från <em>Fysik-Turist</em> till <em>Nobelkandidat</em></li>
+        </ul>
+        <p class="joke">Varför är elektroner aldrig bjudna på fest? De är alltid så negativa. ⚡ (Vänj dig — det blir värre.)</p>
+        <button class="btn-primary" onclick="app.openModule('ellara')">Kör igång! 🚀</button>
+      </div>
+      <div class="card">
+        <h3>📊 Din status</h3>
+        <div id="progress-overview"></div>
+        <button class="btn-ghost" onclick="app.resetProgress()">Nollställ allt (feg utväg)</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast"></div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <footer>
+    <p>Byggd med ❤️ och dåliga skämt för William · Fysik 1b fortsättning</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
