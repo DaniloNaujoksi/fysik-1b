@@ -1,7 +1,7 @@
 // Williams Fysiklabb — motor: språk, navigation, simuleringar, quiz, XP
 
 const app = (() => {
-  const STORAGE_KEY = 'fysiklabb-william';
+  const STORAGE_KEY = 'fysiklabb-william-v2'; // v2: Neustart für alle Geräte, alter Stand wird ignoriert
   let state = load();
   let lang = state.lang || 'sv';
   let activeSim = null;      // { stop } för pågående animation
