@@ -1,9 +1,12 @@
-// Williams Fysiklabb — motor: navigation, simuleringar, quiz, XP
+// Williams Fysiklabb — motor: språk, navigation, simuleringar, quiz, XP
 
 const app = (() => {
   const STORAGE_KEY = 'fysiklabb-william';
   let state = load();
-  let activeSim = null; // { stop: fn } för pågående animation
+  let lang = state.lang || 'sv';
+  let activeSim = null;      // { stop } för pågående animation
+  let currentView = null;    // null = start, annars modul-id
+  let quiz = null;
 
   function load() {
     try {
@@ -12,14 +15,40 @@ const app = (() => {
   }
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
+  // Språkhjälpare: S för UI-strängar, L för tvåspråkiga fält
+  const S = key => STRINGS[lang][key];
+  const L = obj => typeof obj === 'string' ? obj : obj[lang];
+
+  function toggleLang() {
+    lang = lang === 'sv' ? 'de' : 'sv';
+    state.lang = lang;
+    save();
+    renderChrome();
+    if (currentView) {
+      renderModule(MODULES.find(m => m.id === currentView));
+      if (quiz) renderQuestion(); // behåll pågående quiz
+    } else {
+      renderWelcome();
+    }
+  }
+
+  // Statiska texter: header, footer, nav, språkknapp
+  function renderChrome() {
+    document.documentElement.lang = lang;
+    document.getElementById('lang-switch').textContent = S('langBtn');
+    document.querySelectorAll('[data-s]').forEach(el => { el.innerHTML = S(el.dataset.s); });
+    renderXP();
+    refreshNav();
+  }
+
   // ---------- Stjärnhimmel ----------
   function makeStars() {
     const wrap = document.getElementById('stars');
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 60; i++) {
       const s = document.createElement('div');
       s.className = 'star';
-      const size = Math.random() * 2.5 + 0.5;
-      s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${Math.random() * 3}s`;
+      const size = Math.random() * 2 + 0.5;
+      s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${Math.random() * 4}s`;
       wrap.appendChild(s);
     }
   }
@@ -35,8 +64,9 @@ const app = (() => {
 
   function renderXP() {
     const { lvl, next } = levelFor(state.xp);
-    document.getElementById('level-title').textContent = lvl.title;
-    document.getElementById('xp-count').textContent = `${state.xp} XP` + (next ? ` · nästa nivå: ${next.xp} XP` : ' · MAX!');
+    document.getElementById('level-title').textContent = L(lvl.title);
+    document.getElementById('xp-count').textContent =
+      `${state.xp} XP · ` + (next ? `${S('nextLevel')}: ${next.xp} XP` : S('maxLevel'));
     const pct = next ? ((state.xp - lvl.xp) / (next.xp - lvl.xp)) * 100 : 100;
     document.getElementById('xp-fill').style.width = pct + '%';
   }
@@ -47,8 +77,8 @@ const app = (() => {
     save();
     renderXP();
     const after = levelFor(state.xp).lvl;
-    if (after.title !== before.title) {
-      toast(`🎉 NY NIVÅ: ${after.title}`);
+    if (after !== before) {
+      toast(`${S('newLevel')}: ${L(after.title)}`);
       confetti(120);
     }
   }
@@ -56,9 +86,11 @@ const app = (() => {
   // ---------- Navigation ----------
   function buildNav() {
     const nav = document.getElementById('module-nav');
+    nav.innerHTML = '';
     const home = document.createElement('button');
     home.className = 'nav-btn active';
-    home.textContent = '🏠 Start';
+    home.dataset.home = '1';
+    home.textContent = S('home');
     home.onclick = () => openModule(null);
     nav.appendChild(home);
     MODULES.forEach(m => {
@@ -73,10 +105,12 @@ const app = (() => {
 
   function navLabel(m) {
     const done = (state.best[m.id] || 0) >= m.quiz.length;
-    return `${m.icon} ${m.title}${done ? ' <span class="done-check">✓</span>' : ''}`;
+    return `${m.icon} ${L(m.title)}${done ? ' <span class="done-check">✓</span>' : ''}`;
   }
 
   function refreshNav() {
+    const home = document.querySelector('.nav-btn[data-home]');
+    if (home) home.textContent = S('home');
     document.querySelectorAll('.nav-btn[data-mod]').forEach(b => {
       const m = MODULES.find(x => x.id === b.dataset.mod);
       b.innerHTML = navLabel(m);
@@ -85,11 +119,13 @@ const app = (() => {
 
   function openModule(id) {
     if (activeSim) { activeSim.stop(); activeSim = null; }
+    quiz = null;
+    currentView = id;
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     if (!id) {
+      document.querySelector('.nav-btn[data-home]').classList.add('active');
+      renderWelcome();
       showSection('welcome');
-      document.querySelector('#module-nav .nav-btn').classList.add('active');
-      renderOverview();
       return;
     }
     const m = MODULES.find(x => x.id === id);
@@ -103,8 +139,50 @@ const app = (() => {
     document.getElementById(id).classList.add('active');
   }
 
+  // ---------- Startsida ----------
+  function renderWelcome() {
+    document.getElementById('welcome').innerHTML = `
+      <div class="card">
+        <h2>${S('welcomeH')}</h2>
+        <p>${S('welcomeIntro')}</p>
+        <p>${S('howItWorks')}</p>
+        <ul>
+          <li>${S('feat1')}</li>
+          <li>${S('feat2')}</li>
+          <li>${S('feat3')}</li>
+          <li>${S('feat4')}</li>
+        </ul>
+        <p class="joke">${S('welcomeJoke')}</p>
+        <button class="btn-primary" onclick="app.openModule('ellara')">${S('ctaStart')}</button>
+      </div>
+      <div class="card">
+        <h3>${S('statusH')}</h3>
+        <div id="progress-overview">${MODULES.map(m => {
+          const best = state.best[m.id] || 0;
+          const done = best >= m.quiz.length;
+          return `<div class="prog-row">
+            <span>${m.icon} ${L(m.title)}</span>
+            <span class="best">${done ? '✅ ' : ''}${best}/${m.quiz.length}</span>
+          </div>`;
+        }).join('')}</div>
+        <br>
+        <button class="btn-ghost" onclick="app.resetProgress()">${S('resetBtn')}</button>
+      </div>`;
+  }
+
+  function resetProgress() {
+    if (!confirm(S('resetConfirm'))) return;
+    state = { xp: 0, best: {}, lang };
+    save();
+    renderXP();
+    renderWelcome();
+    refreshNav();
+    toast(S('resetDone'));
+  }
+
   // ---------- Modulrendering ----------
   function renderModule(m) {
+    if (activeSim) { activeSim.stop(); activeSim = null; }
     let sec = document.getElementById('module-view');
     if (!sec) {
       sec = document.createElement('section');
@@ -114,65 +192,46 @@ const app = (() => {
     const best = state.best[m.id] || 0;
     sec.innerHTML = `
       <div class="card">
-        <h2>${m.icon} ${m.title}</h2>
-        <p>${m.intro}</p>
+        <h2>${m.icon} ${L(m.title)}</h2>
+        <p>${L(m.intro)}</p>
         ${m.theory.map(t => `
           <div class="theory-block">
-            <h4>${t.h}</h4>
-            <p>${t.p}</p>
+            <h4>${L(t.h)}</h4>
+            <p>${L(t.p)}</p>
             <div>${t.f.map(f => `<span class="formula">${f}</span>`).join(' ')}</div>
+            <div class="eli5"><b>${S('eli5Label')}</b><br>${L(t.eli5)}</div>
           </div>`).join('')}
-        <p class="joke">😄 ${m.joke}</p>
+        <p class="joke">😄 ${L(m.joke)}</p>
       </div>
       <div class="card">
-        <h3>${m.simTitle}</h3>
-        <p>${m.simDesc}</p>
+        <h3>${L(m.simTitle)}</h3>
+        <p>${L(m.simDesc)}</p>
         <div class="sim-wrap" id="sim-container"></div>
       </div>
       <div class="card">
-        <h3>🎯 Quiz — ${m.quiz.length} frågor · bästa: ${best}/${m.quiz.length}</h3>
-        <p>10 XP per rätt svar. Fullpott ger 20 bonus-XP och konfetti. Konfettin är vetenskapligt bevisad motivationshöjare.*</p>
-        <p style="font-size:.75rem;color:var(--text-dim)">*Nej det är den inte.</p>
+        <h3>${S('quizH')} — ${m.quiz.length} ${S('questions')} · ${S('best')}: ${best}/${m.quiz.length}</h3>
+        <p>${S('quizNote')}</p>
+        <p style="font-size:.75rem;color:var(--text-3)">${S('quizFootnote')}</p>
         <div id="quiz-container">
-          <button class="btn-primary" onclick="app.startQuiz('${m.id}')">Starta quizet 🎬</button>
+          <button class="btn-primary" onclick="app.startQuiz('${m.id}')">${S('startQuiz')}</button>
         </div>
       </div>`;
     showSection('module-view');
     activeSim = SIMS[m.sim](document.getElementById('sim-container'));
   }
 
-  // ---------- Startsidans översikt ----------
-  function renderOverview() {
-    const el = document.getElementById('progress-overview');
-    el.innerHTML = MODULES.map(m => {
-      const best = state.best[m.id] || 0;
-      const done = best >= m.quiz.length;
-      return `<div class="prog-row">
-        <span>${m.icon} ${m.title}</span>
-        <span class="best">${done ? '✅ ' : ''}${best}/${m.quiz.length}</span>
-      </div>`;
-    }).join('');
-  }
-
-  function resetProgress() {
-    if (!confirm('Säkert? All XP och alla resultat försvinner. Einstein kommer att vara besviken.')) return;
-    state = { xp: 0, best: {} };
-    save();
-    renderXP();
-    renderOverview();
-    refreshNav();
-    toast('Allt nollställt. Vi låtsas att det aldrig hände. 🤫');
-  }
-
   // ---------- Quiz ----------
-  let quiz = null;
-
   function startQuiz(modId) {
     const m = MODULES.find(x => x.id === modId);
-    // Blanda frågor och svarsalternativ
+    // Blanda frågor och svarsalternativ; behåll tvåspråkiga objekt
     const questions = shuffle(m.quiz.map(q => {
-      const order = shuffle(q.a.map((_, i) => i));
-      return { q: q.q, a: order.map(i => q.a[i]), correct: order.indexOf(q.correct), expl: q.expl };
+      const order = shuffle(q.a.sv.map((_, i) => i));
+      return {
+        q: q.q,
+        a: order.map(i => ({ sv: q.a.sv[i], de: q.a.de[i] })),
+        correct: order.indexOf(q.correct),
+        expl: q.expl
+      };
     }));
     quiz = { modId, questions, index: 0, score: 0, results: [] };
     renderQuestion();
@@ -186,9 +245,9 @@ const app = (() => {
       <div class="quiz-progress">${questions.map((_, i) =>
         `<div class="quiz-dot ${i < index ? (results[i] ? 'correct' : 'wrong') : i === index ? 'current' : ''}"></div>`).join('')}
       </div>
-      <div class="quiz-q">Fråga ${index + 1}/${questions.length}: ${q.q}</div>
+      <div class="quiz-q">${S('questionWord')} ${index + 1}/${questions.length}: ${L(q.q)}</div>
       <div class="quiz-answers">${q.a.map((a, i) =>
-        `<button class="answer-btn" onclick="app.answer(${i})">${String.fromCharCode(65 + i)}. ${a}</button>`).join('')}
+        `<button class="answer-btn" onclick="app.answer(${i})">${String.fromCharCode(65 + i)}. ${L(a)}</button>`).join('')}
       </div>
       <div id="quiz-feedback"></div>`;
   }
@@ -203,11 +262,11 @@ const app = (() => {
       if (bi === q.correct) b.classList.add('correct');
       else if (bi === i) b.classList.add('wrong');
     });
-    const msg = correct ? pick(PRAISE) : pick(ROAST);
+    const msg = correct ? pick(S('praise')) : pick(S('roast'));
     document.getElementById('quiz-feedback').innerHTML = `
       <div class="quiz-feedback ${correct ? 'good' : 'bad'}">
-        <b>${msg}</b><br>${q.expl}<br><br>
-        <button class="btn-primary" onclick="app.nextQuestion()">${quiz.index + 1 < quiz.questions.length ? 'Nästa fråga →' : 'Visa resultat 🏁'}</button>
+        <b>${msg}</b><br>${L(q.expl)}<br>
+        <button class="btn-primary" onclick="app.nextQuestion()">${quiz.index + 1 < quiz.questions.length ? S('nextQ') : S('showResult')}</button>
       </div>`;
     document.getElementById('quiz-feedback').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -227,18 +286,18 @@ const app = (() => {
     if (perfect) { addXP(20); confetti(200); }
     const pct = score / total;
     const [emoji, verdict] =
-      perfect ? ['🏆', 'FULLPOTT! Du ÄR fysiken nu. Rimligtvis borde Nobelkommittén höra av sig.'] :
-      pct >= 0.75 ? ['🚀', 'Riktigt starkt! Bara lite finslipning kvar.'] :
-      pct >= 0.5 ? ['🧪', 'Halvvägs till genialitet. Läs teorin igen och kör en runda till.'] :
-      ['🫠', 'Aj. Men lugn — även Einstein fick underkänt ibland (nej, det är en myt, men det låter tröstande).'];
+      perfect ? ['🏆', S('verdictPerfect')] :
+      pct >= 0.75 ? ['🚀', S('verdictGreat')] :
+      pct >= 0.5 ? ['🧪', S('verdictHalf')] :
+      ['🫠', S('verdictOof')];
     document.getElementById('quiz-container').innerHTML = `
       <div class="quiz-result">
         <span class="big-emoji">${emoji}</span>
-        <h3>${score}/${total} rätt</h3>
+        <h3>${score}/${total} ${S('correctOf')}</h3>
         <p>${verdict}</p>
-        <p style="color:var(--text-dim)">+${score * 10}${perfect ? ' +20 bonus' : ''} XP</p><br>
-        <button class="btn-primary" onclick="app.startQuiz('${modId}')">Kör igen 🔄</button>
-        <button class="btn-ghost" onclick="app.openModule(null)" style="margin-left:8px">Till start 🏠</button>
+        <p style="color:var(--text-3)">+${score * 10}${perfect ? ' +20 ' + S('bonus') : ''} XP</p><br>
+        <button class="btn-primary" onclick="app.startQuiz('${modId}')">${S('again')}</button>
+        <button class="btn-ghost" onclick="app.openModule(null)" style="margin-left:8px">${S('toHome')}</button>
       </div>`;
     quiz = null;
   }
@@ -268,7 +327,7 @@ const app = (() => {
     const ctx = canvas.getContext('2d');
     canvas.width = innerWidth;
     canvas.height = innerHeight;
-    const colors = ['#7c6cff', '#00d4ff', '#ff6b9d', '#3ddc84', '#ffd93d'];
+    const colors = ['#6e63ff', '#2dd4bf', '#f87171', '#34d399', '#fbbf24'];
     const parts = Array.from({ length: count }, () => ({
       x: Math.random() * canvas.width,
       y: -20 - Math.random() * canvas.height * 0.5,
@@ -297,8 +356,6 @@ const app = (() => {
   }
 
   // ---------- Simuleringar ----------
-  // Varje sim returnerar { stop } så animationen kan städas vid modulbyte.
-
   function simShell(container, controlsHtml, readoutHtml, height = 260) {
     container.innerHTML = `
       <canvas class="sim-canvas" width="800" height="${height}"></canvas>
@@ -318,9 +375,9 @@ const app = (() => {
     // --- Ellära: krets med lampa ---
     circuit(container) {
       const canvas = simShell(container,
-        slider('sim-u', 'Spänning U', 1, 24, 12, 1, ' V') + slider('sim-r', 'Resistans R', 1, 24, 6, 1, ' Ω'),
-        `<div class="readout-box">Ström: <b id="sim-i">2.0 A</b></div>
-         <div class="readout-box">Effekt: <b id="sim-p">24 W</b></div>`);
+        slider('sim-u', S('sVoltage'), 1, 24, 12, 1, ' V') + slider('sim-r', S('sResistance'), 1, 24, 6, 1, ' Ω'),
+        `<div class="readout-box">${S('sCurrent')}: <b id="sim-i">2.0 A</b></div>
+         <div class="readout-box">${S('sPower')}: <b id="sim-p">24 W</b></div>`);
       const ctx = canvas.getContext('2d');
       let U = 12, R = 6, phase = 0, running = true;
       const electrons = Array.from({ length: 14 }, (_, i) => i / 14);
@@ -334,7 +391,6 @@ const app = (() => {
         container.querySelector('#sim-p').textContent = (U * U / R).toFixed(0) + ' W';
       }
 
-      // Rektangulär kretsbana
       const path = [[150, 200], [150, 80], [650, 80], [650, 200], [150, 200]];
       const segLens = [];
       let totalLen = 0;
@@ -359,23 +415,22 @@ const app = (() => {
         const I = U / R;
         const P = U * U / R;
         ctx.clearRect(0, 0, 800, 260);
-        // Ledningar
-        ctx.strokeStyle = '#4a5580';
+        ctx.strokeStyle = '#3d4463';
         ctx.lineWidth = 4;
         ctx.beginPath();
         path.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
         ctx.stroke();
-        // Batteri (vänster)
-        ctx.fillStyle = '#151a2e';
+        // Batteri
+        ctx.fillStyle = '#16181f';
         ctx.fillRect(120, 120, 60, 50);
-        ctx.strokeStyle = '#7c6cff';
+        ctx.strokeStyle = '#6e63ff';
         ctx.strokeRect(120, 120, 60, 50);
-        ctx.fillStyle = '#e8eaf6';
-        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#f2f3f7';
+        ctx.font = '14px Helvetica, Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(U + ' V', 150, 150);
         ctx.fillText('🔋', 150, 115);
-        // Lampa (höger) — ljusstyrka efter effekt
+        // Lampa — ljusstyrka efter effekt
         const glow = Math.min(1, P / 60);
         const grad = ctx.createRadialGradient(650, 145, 5, 650, 145, 60);
         grad.addColorStop(0, `rgba(255, 220, 100, ${0.25 + glow * 0.75})`);
@@ -386,17 +441,17 @@ const app = (() => {
         ctx.fill();
         ctx.font = `${24 + glow * 14}px sans-serif`;
         ctx.fillText('💡', 650, 155);
-        // Resistor (uppe)
-        ctx.fillStyle = '#151a2e';
+        // Resistor
+        ctx.fillStyle = '#16181f';
         ctx.fillRect(360, 65, 80, 30);
-        ctx.strokeStyle = '#ff6b9d';
+        ctx.strokeStyle = '#f87171';
         ctx.strokeRect(360, 65, 80, 30);
-        ctx.fillStyle = '#e8eaf6';
-        ctx.font = '13px sans-serif';
+        ctx.fillStyle = '#f2f3f7';
+        ctx.font = '13px Helvetica, Arial, sans-serif';
         ctx.fillText(R + ' Ω', 400, 85);
-        // Elektroner — fart proportionell mot ström
+        // Elektroner
         phase += I * 0.0018;
-        ctx.fillStyle = '#00d4ff';
+        ctx.fillStyle = '#2dd4bf';
         electrons.forEach(off => {
           const [x, y] = pointAt((off + phase) % 1);
           ctx.beginPath();
@@ -411,10 +466,10 @@ const app = (() => {
     // --- Kärnfysik: sönderfall ---
     decay(container) {
       const canvas = simShell(container,
-        slider('sim-t12', 'Halveringstid', 1, 10, 3, 1, ' s') +
-        `<div class="sim-control"><button class="btn-primary" id="sim-start" style="width:100%">☢️ Starta sönderfall</button></div>`,
-        `<div class="readout-box">Kvar: <b id="sim-n">400 / 400</b></div>
-         <div class="readout-box">Tid: <b id="sim-time">0,0 s</b></div>`, 300);
+        slider('sim-t12', S('sHalfLife'), 1, 10, 3, 1, ' s') +
+        `<div class="sim-control"><button class="btn-primary" id="sim-start" style="width:100%">${S('sStartDecay')}</button></div>`,
+        `<div class="readout-box">${S('sLeft')}: <b id="sim-n">400 / 400</b></div>
+         <div class="readout-box">${S('sTime')}: <b id="sim-time">0,0 s</b></div>`, 300);
       const ctx = canvas.getContext('2d');
       let T12 = 3, running = true, playing = false, t = 0, last = 0;
       const N0 = 400;
@@ -442,7 +497,6 @@ const app = (() => {
           const dt = Math.min((now - last) / 1000, 0.1);
           last = now;
           t += dt;
-          // Sannolikhet per atom: p = 1 − 2^(−dt/T½)
           const p = 1 - Math.pow(2, -dt / T12);
           atoms.forEach(a => { if (a.alive && Math.random() < p) a.alive = false; });
           const alive = atoms.filter(a => a.alive).length;
@@ -452,25 +506,22 @@ const app = (() => {
           if (alive === 0 || t > T12 * 6) playing = false;
         }
         ctx.clearRect(0, 0, 800, 300);
-        // Atomer till vänster
         atoms.forEach(a => {
-          ctx.fillStyle = a.alive ? '#3ddc84' : 'rgba(255,84,112,.25)';
+          ctx.fillStyle = a.alive ? '#34d399' : 'rgba(248,113,113,.25)';
           ctx.beginPath();
           ctx.arc(a.x, a.y, a.alive ? 5 : 3, 0, Math.PI * 2);
           ctx.fill();
         });
-        // Graf till höger
         const gx = 440, gy = 20, gw = 330, gh = 250;
-        ctx.strokeStyle = '#4a5580';
+        ctx.strokeStyle = '#3d4463';
         ctx.lineWidth = 1;
         ctx.strokeRect(gx, gy, gw, gh);
-        ctx.fillStyle = '#9aa0c3';
-        ctx.font = '12px sans-serif';
+        ctx.fillStyle = '#a6abbd';
+        ctx.font = '12px Helvetica, Arial, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('N (antal kvar)', gx + 5, gy + 15);
+        ctx.fillText('N', gx + 5, gy + 15);
         ctx.fillText('t', gx + gw - 12, gy + gh - 6);
-        // Halveringslinjer
-        ctx.strokeStyle = 'rgba(124,108,255,.3)';
+        ctx.strokeStyle = 'rgba(110,99,255,.3)';
         [0.5, 0.25, 0.125].forEach(f => {
           const y = gy + gh - f * gh;
           ctx.beginPath(); ctx.moveTo(gx, y); ctx.lineTo(gx + gw, y); ctx.stroke();
@@ -478,7 +529,7 @@ const app = (() => {
         });
         if (history.length > 1) {
           const tMax = Math.max(T12 * 6, t);
-          ctx.strokeStyle = '#00d4ff';
+          ctx.strokeStyle = '#2dd4bf';
           ctx.lineWidth = 2;
           ctx.beginPath();
           history.forEach(([ht, hn], i) => {
@@ -496,22 +547,22 @@ const app = (() => {
     // --- Relativitet: tidsdilatation ---
     relativity(container) {
       const canvas = simShell(container,
-        slider('sim-v', 'Raketens fart', 0, 99, 50, 1, ' % av c'),
-        `<div class="readout-box">Gammafaktor γ: <b id="sim-gamma">1.15</b></div>
-         <div class="readout-box">1 år ombord = <b id="sim-years">1.15 år</b> på jorden</div>`);
+        slider('sim-v', S('sSpeed'), 0, 99, 50, 1, ' % c'),
+        `<div class="readout-box">${S('sGamma')}: <b id="sim-gamma">1.15</b></div>
+         <div class="readout-box">${S('sYearOnBoard')} <b id="sim-years">1.15</b> ${S('sYearsEarth')}</div>`);
       const ctx = canvas.getContext('2d');
       let v = 0.5, running = true, earthAngle = 0, rocketX = 0;
 
       container.querySelector('#sim-v').oninput = e => {
         v = +e.target.value / 100;
-        container.querySelector('#sim-v-val').textContent = e.target.value + ' % av c';
+        container.querySelector('#sim-v-val').textContent = e.target.value + ' % c';
         upd();
       };
       function gamma() { return 1 / Math.sqrt(1 - v * v); }
       function upd() {
         const g = gamma();
         container.querySelector('#sim-gamma').textContent = g.toFixed(2);
-        container.querySelector('#sim-years').textContent = g.toFixed(2) + ' år';
+        container.querySelector('#sim-years').textContent = g.toFixed(2);
       }
       upd();
 
@@ -525,8 +576,8 @@ const app = (() => {
         ctx.moveTo(x, y);
         ctx.lineTo(x + Math.cos(angle - Math.PI / 2) * r * 0.75, y + Math.sin(angle - Math.PI / 2) * r * 0.75);
         ctx.stroke();
-        ctx.fillStyle = '#e8eaf6';
-        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#f2f3f7';
+        ctx.font = '14px Helvetica, Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(label, x, y + r + 20);
       }
@@ -536,19 +587,16 @@ const app = (() => {
         ctx.clearRect(0, 0, 800, 260);
         const g = gamma();
         earthAngle += 0.05;
-        // Jordklocka
         ctx.font = '36px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('🌍', 160, 70);
-        clock(160, 150, 45, earthAngle, 'Jordens klocka', '#00d4ff');
-        // Raketklocka — går långsammare med faktor γ
+        clock(160, 150, 45, earthAngle, S('sEarthClock'), '#2dd4bf');
         rocketX = (rocketX + v * 4) % 380;
         ctx.font = '30px sans-serif';
         ctx.fillText('🚀', 400 + rocketX, 70);
-        clock(560, 150, 45, earthAngle / g, `Raketens klocka (går ${g.toFixed(2)}× långsammare)`, '#ff6b9d');
-        // Fartstreck
+        clock(560, 150, 45, earthAngle / g, `${S('sRocketClock')} (${g.toFixed(2)}${S('sSlower')})`, '#f87171');
         if (v > 0.05) {
-          ctx.strokeStyle = 'rgba(0,212,255,.4)';
+          ctx.strokeStyle = 'rgba(45,212,191,.4)';
           ctx.lineWidth = 2;
           for (let i = 0; i < 5; i++) {
             const lx = 380 + rocketX - i * 18 - 10;
@@ -566,15 +614,14 @@ const app = (() => {
     // --- Energi: kula i skål (Ep <-> Ek) ---
     energy(container) {
       const canvas = simShell(container,
-        slider('sim-fric', 'Friktion', 0, 10, 2, 1, '') +
-        `<div class="sim-control"><button class="btn-primary" id="sim-drop" style="width:100%">🔄 Släpp kulan igen</button></div>`,
-        `<div class="readout-box">Lägesenergi: <b id="sim-ep">100 %</b></div>
-         <div class="readout-box">Rörelseenergi: <b id="sim-ek">0 %</b></div>
-         <div class="readout-box">Värme (förlust): <b id="sim-heat">0 %</b></div>`);
+        slider('sim-fric', S('sFriction'), 0, 10, 2, 1, '') +
+        `<div class="sim-control"><button class="btn-primary" id="sim-drop" style="width:100%">${S('sDropAgain')}</button></div>`,
+        `<div class="readout-box">${S('sEp')}: <b id="sim-ep">100 %</b></div>
+         <div class="readout-box">${S('sEk')}: <b id="sim-ek">0 %</b></div>
+         <div class="readout-box">${S('sHeatLoss')}: <b id="sim-heat">0 %</b></div>`);
       const ctx = canvas.getContext('2d');
       let running = true, fric = 2;
-      // Kulan glider i parabelformad skål: y = k·x², enkel pendling
-      let pos = -1, vel = 0; // pos i [-1, 1]
+      let pos = -1, vel = 0;
       container.querySelector('#sim-fric').oninput = e => {
         fric = +e.target.value;
         container.querySelector('#sim-fric-val').textContent = fric;
@@ -583,7 +630,6 @@ const app = (() => {
 
       (function draw() {
         if (!running) return;
-        // Enkel fysik: acceleration mot mitten proportionell mot lutningen
         const acc = -pos * 0.004;
         vel += acc;
         vel *= (1 - fric * 0.0012);
@@ -598,8 +644,7 @@ const app = (() => {
         container.querySelector('#sim-heat').textContent = Math.round(heat * 100) + ' %';
 
         ctx.clearRect(0, 0, 800, 260);
-        // Skål
-        ctx.strokeStyle = '#4a5580';
+        ctx.strokeStyle = '#3d4463';
         ctx.lineWidth = 4;
         ctx.beginPath();
         for (let px = -1; px <= 1; px += 0.02) {
@@ -608,21 +653,19 @@ const app = (() => {
           px === -1 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
         ctx.stroke();
-        // Kula
         const bx = 250 + pos * 200;
         const by = 80 + (pos * pos) * 140 - 12;
         ctx.font = '24px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('⚽', bx, by + 8);
-        // Energistaplar
-        const bars = [['Ep', ep, '#7c6cff'], ['Ek', Math.min(ek, 1), '#00d4ff'], ['Värme', heat, '#ff6b9d']];
+        const bars = [[S('sEp'), ep, '#6e63ff'], [S('sEk'), Math.min(ek, 1), '#2dd4bf'], [S('sHeatBar'), heat, '#f87171']];
         bars.forEach(([label, val, color], i) => {
-          const x = 560 + i * 70;
+          const x = 550 + i * 78;
           const hgt = Math.max(0, Math.min(1, val)) * 160;
           ctx.fillStyle = color;
           ctx.fillRect(x, 210 - hgt, 40, hgt);
-          ctx.fillStyle = '#9aa0c3';
-          ctx.font = '13px sans-serif';
+          ctx.fillStyle = '#a6abbd';
+          ctx.font = '12px Helvetica, Arial, sans-serif';
           ctx.fillText(label, x + 20, 232);
         });
         requestAnimationFrame(draw);
@@ -633,9 +676,9 @@ const app = (() => {
     // --- Tryck: dykare ---
     pressure(container) {
       const canvas = simShell(container,
-        slider('sim-depth', 'Djup', 0, 40, 5, 1, ' m'),
-        `<div class="readout-box">Vattentryck: <b id="sim-pw">49 kPa</b></div>
-         <div class="readout-box">Totalt tryck (inkl. luft): <b id="sim-pt">150 kPa</b></div>`, 300);
+        slider('sim-depth', S('sDepth'), 0, 40, 5, 1, ' m'),
+        `<div class="readout-box">${S('sWaterP')}: <b id="sim-pw">49 kPa</b></div>
+         <div class="readout-box">${S('sTotalP')}: <b id="sim-pt">150 kPa</b></div>`, 300);
       const ctx = canvas.getContext('2d');
       let depth = 5, running = true, bubbles = [];
 
@@ -650,33 +693,29 @@ const app = (() => {
       (function draw() {
         if (!running) return;
         ctx.clearRect(0, 0, 800, 300);
-        // Himmel + vatten
-        ctx.fillStyle = '#1a2a4a';
+        ctx.fillStyle = '#1a2338';
         ctx.fillRect(0, 0, 800, 40);
         const waterGrad = ctx.createLinearGradient(0, 40, 0, 300);
-        waterGrad.addColorStop(0, 'rgba(0,120,220,.5)');
-        waterGrad.addColorStop(1, 'rgba(0,20,80,.9)');
+        waterGrad.addColorStop(0, 'rgba(0,110,200,.45)');
+        waterGrad.addColorStop(1, 'rgba(0,18,70,.9)');
         ctx.fillStyle = waterGrad;
         ctx.fillRect(0, 40, 800, 260);
-        ctx.fillStyle = '#9aa0c3';
-        ctx.font = '13px sans-serif';
+        ctx.fillStyle = '#a6abbd';
+        ctx.font = '13px Helvetica, Arial, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('yta (0 m)', 10, 36);
-        // Djupmarkeringar
+        ctx.fillText(S('sSurface'), 10, 36);
         for (let d = 10; d <= 40; d += 10) {
           const y = 40 + (d / 40) * 250;
           ctx.strokeStyle = 'rgba(255,255,255,.15)';
           ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(800, y); ctx.stroke();
           ctx.fillText(d + ' m', 10, y - 4);
         }
-        // Dykare
         const dy = 40 + (depth / 40) * 250;
         ctx.font = '30px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('🤿', 400, dy);
-        // Tryckpilar — längd efter tryck
         const arrowLen = 15 + depth * 1.5;
-        ctx.strokeStyle = '#ffd93d';
+        ctx.strokeStyle = '#fbbf24';
         ctx.lineWidth = 2;
         [[400 - 60, dy - 8, 1, 0], [400 + 60, dy - 8, -1, 0], [400, dy - 55, 0, 1], [400, dy + 35, 0, -1]].forEach(([ax, ay, dx2, dy2]) => {
           ctx.beginPath();
@@ -690,7 +729,6 @@ const app = (() => {
           ctx.lineTo(ax - dx2 * 8 + dy2 * 5, ay - dy2 * 8 + dx2 * 5);
           ctx.stroke();
         });
-        // Bubblor
         if (Math.random() < 0.15) bubbles.push({ x: 395 + Math.random() * 10, y: dy - 15, r: 2 + Math.random() * 3 });
         bubbles = bubbles.filter(b => b.y > 45);
         ctx.strokeStyle = 'rgba(255,255,255,.5)';
@@ -709,14 +747,14 @@ const app = (() => {
     // --- Värme: koka vatten ---
     heat(container) {
       const canvas = simShell(container,
-        slider('sim-power', 'Effekt', 0, 3000, 1500, 100, ' W') +
-        `<div class="sim-control"><button class="btn-primary" id="sim-reset" style="width:100%">🧊 Börja om (20 °C)</button></div>`,
-        `<div class="readout-box">Temperatur: <b id="sim-temp">20 °C</b></div>
-         <div class="readout-box">Tillförd energi: <b id="sim-energy">0 kJ</b></div>
-         <div class="readout-box" id="sim-status-box">Status: <b id="sim-status">Väntar…</b></div>`);
+        slider('sim-power', S('sPowerW'), 0, 3000, 1500, 100, ' W') +
+        `<div class="sim-control"><button class="btn-primary" id="sim-reset" style="width:100%">${S('sRestart')}</button></div>`,
+        `<div class="readout-box">${S('sTemp')}: <b id="sim-temp">20 °C</b></div>
+         <div class="readout-box">${S('sEnergyIn')}: <b id="sim-energy">0 kJ</b></div>
+         <div class="readout-box">${S('sStatus')}: <b id="sim-status">${S('sWaiting')}</b></div>`);
       const ctx = canvas.getContext('2d');
       let running = true, power = 1500, temp = 20, energy = 0, boilEnergy = 0, last = performance.now();
-      const m = 1.0, c = 4180, lAnga = 2260000; // 1 kg vatten
+      const m = 1.0, c = 4180, lAnga = 2260000;
       let steamParts = [];
 
       container.querySelector('#sim-power').oninput = e => {
@@ -727,43 +765,39 @@ const app = (() => {
 
       (function draw(now) {
         if (!running) return;
-        const dt = Math.min((now - last) / 1000, 0.1) * 20; // 20× tidsskala
+        const dt = Math.min((now - last) / 1000, 0.1) * 20;
         last = now;
         const dE = power * dt;
         energy += dE;
         if (temp < 100) {
           temp = Math.min(100, temp + dE / (c * m));
         } else if (boilEnergy < lAnga * m) {
-          boilEnergy += dE; // platå — energin går till fasövergång
+          boilEnergy += dE;
         }
         const boiling = temp >= 100;
         const done = boilEnergy >= lAnga * m;
         container.querySelector('#sim-temp').textContent = Math.round(temp) + ' °C';
         container.querySelector('#sim-energy').textContent = Math.round(energy / 1000) + ' kJ';
         container.querySelector('#sim-status').textContent =
-          done ? 'Allt har kokat bort! 💨' :
-          boiling ? `Kokar! Fasövergång: ${Math.round(boilEnergy / (lAnga * m) * 100)} %` :
-          power > 0 ? 'Värmer upp…' : 'Väntar…';
+          done ? S('sAllGone') :
+          boiling ? `${S('sBoiling')}: ${Math.round(boilEnergy / (lAnga * m) * 100)} %` :
+          power > 0 ? S('sHeating') : S('sWaiting');
 
         ctx.clearRect(0, 0, 800, 260);
-        // Kastrull
         const waterFrac = done ? 0 : 1 - (boilEnergy / (lAnga * m)) * 0.9;
-        ctx.strokeStyle = '#9aa0c3';
+        ctx.strokeStyle = '#a6abbd';
         ctx.lineWidth = 4;
         ctx.strokeRect(300, 80, 200, 130);
-        // Vatten — färg efter temperatur
         const warm = (temp - 20) / 80;
         ctx.fillStyle = `rgb(${Math.round(40 + warm * 180)}, ${Math.round(100 - warm * 40)}, ${Math.round(220 - warm * 100)})`;
         const wh = 120 * waterFrac;
         ctx.fillRect(303, 207 - wh, 194, wh);
-        // Platta
         ctx.fillStyle = power > 0 ? `rgba(255, ${Math.max(0, 120 - power / 15)}, 60, ${0.3 + power / 4000})` : '#333';
         ctx.fillRect(290, 215, 220, 12);
-        ctx.fillStyle = '#9aa0c3';
-        ctx.font = '13px sans-serif';
+        ctx.fillStyle = '#a6abbd';
+        ctx.font = '13px Helvetica, Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('spisplatta (' + power + ' W)', 400, 245);
-        // Bubblor vid kokning
+        ctx.fillText(`${S('sPlate')} (${power} W)`, 400, 245);
         if (boiling && !done && Math.random() < 0.4) {
           steamParts.push({ x: 320 + Math.random() * 160, y: 90, vy: -0.8 - Math.random(), life: 60 });
         }
@@ -775,20 +809,19 @@ const app = (() => {
           ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
           ctx.fill();
         });
-        // Termometer
-        ctx.strokeStyle = '#4a5580';
+        ctx.strokeStyle = '#3d4463';
         ctx.lineWidth = 2;
         ctx.strokeRect(600, 40, 24, 180);
-        const th = ((temp - 0) / 120) * 176;
-        ctx.fillStyle = temp >= 100 ? '#ff5470' : '#00d4ff';
+        const th = (temp / 120) * 176;
+        ctx.fillStyle = temp >= 100 ? '#f87171' : '#2dd4bf';
         ctx.fillRect(602, 218 - th, 20, th);
-        ctx.fillStyle = '#e8eaf6';
-        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#f2f3f7';
+        ctx.font = '14px Helvetica, Arial, sans-serif';
         ctx.fillText(Math.round(temp) + ' °C', 612, 30);
         [0, 50, 100].forEach(t2 => {
           const y = 218 - (t2 / 120) * 176;
-          ctx.fillStyle = '#9aa0c3';
-          ctx.font = '11px sans-serif';
+          ctx.fillStyle = '#a6abbd';
+          ctx.font = '11px Helvetica, Arial, sans-serif';
           ctx.fillText(t2 + '°', 650, y + 4);
         });
         requestAnimationFrame(draw);
@@ -801,8 +834,9 @@ const app = (() => {
   document.addEventListener('DOMContentLoaded', () => {
     makeStars();
     buildNav();
-    renderXP();
-    renderOverview();
+    renderChrome();
+    renderWelcome();
+    document.getElementById('lang-switch').onclick = toggleLang;
   });
 
   return { openModule, startQuiz, answer, nextQuestion, resetProgress };
